@@ -13,7 +13,12 @@ import android.provider.CalendarContract;
 import android.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
@@ -33,12 +38,12 @@ public class PickCalendarActivity extends ListActivity
 
         // For the cursor adapter, specify which columns go into which views
         String[] fromColumns = {CalendarContract.Calendars.NAME };
-        int[] toViews = {android.R.id.text1}; // The TextView in simple_list_item_1
+        int[] toViews = { R.id.item }; // The TextView in simple_list_item_1
 
         // Create an empty adapter we will use to display the loaded data.
         // We pass null for the cursor, then update it in onLoadFinished()
         mAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1, null,
+                R.layout.calendar_list_item, null,
                 fromColumns, toViews, 0);
         setListAdapter(mAdapter);
 
@@ -73,7 +78,8 @@ public class PickCalendarActivity extends ListActivity
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
+        ImageView img = v.findViewById(R.id.checkbox);
+        img.setVisibility(img.getVisibility() != View.VISIBLE ? View.VISIBLE : View.GONE);
     }
 
     public void retrieveCalendars(){
