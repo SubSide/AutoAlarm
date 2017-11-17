@@ -11,6 +11,7 @@
 
 
     <string name="pick_calendar_header">Which calendars should be used?</string>
+    <string name="pick_calendar_done">Done</string>
 
     <string name="calendar_id">Calendar id</string>
     <string name="calendar_selected">Calendar selected</string>

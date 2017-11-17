@@ -16,16 +16,11 @@
         <include layout="@layout/top_bar_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <ScrollView
+        <FrameLayout
+            android:id="@+id/base_frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <FrameLayout
-                android:id="@+id/base_frame"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="20dp" />
-        </ScrollView>
+            android:layout_height="match_parent"
+            android:paddingTop="20dp" />
 
     </LinearLayout>
 
