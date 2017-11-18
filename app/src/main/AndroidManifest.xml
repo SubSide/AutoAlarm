@@ -3,6 +3,8 @@
     package="nl.thomasvdbulk.autoalarm">
 
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -21,8 +23,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PickCalendarActivity"
+        <activity
+            android:name=".PickCalendarActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+
+        <receiver
+            android:name=".background.ApiRequestAlarm"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

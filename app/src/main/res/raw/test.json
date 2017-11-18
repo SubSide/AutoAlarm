@@ -1,0 +1,1040 @@
+{
+  "journeys": [
+    {
+      "id": "fromRef=station-leiden-lammenschans&toRef=warmond/ganzenwei&searchType=departure&dateTime=2017-11-17T12:33&interchangeTime=standard&sequence=1&modes=train:true,bus:true,subway:true,tram:true,ferry:true&PlanWithAccessibility=False",
+      "realtimeInfo": {
+        "ludMessages": [],
+        "detour": "normal",
+        "delays": "internal",
+        "cancellations": "none"
+      },
+      "fasterJourneyId": null,
+      "departure": "2017-11-17T12:33",
+      "arrival": "2017-11-17T13:06",
+      "realtimeDeparture": null,
+      "realtimeArrival": "2017-11-17T13:08",
+      "numberOfChanges": 1,
+      "legs": [
+        {
+          "type": "scheduled",
+          "mode": {
+            "type": "train",
+            "name": "Intercity"
+          },
+          "destination": "Leiden Centraal",
+          "operator": {
+            "type": "NS",
+            "name": "NS",
+            "contactpageurl": "https://www.ns.nl/formulieren/contact.html"
+          },
+          "service": "8836",
+          "attributes": [],
+          "disturbancePlannerIds": [],
+          "serviceMessageIds": [],
+          "stops": [
+            {
+              "arrival": "2017-11-17T12:33",
+              "departure": "2017-11-17T12:33",
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": "1",
+              "platformChange": null,
+              "location": {
+                "id": "station-leiden-lammenschans",
+                "type": "station",
+                "stationId": "ldl",
+                "stationType": "Station",
+                "name": "Leiden Lammenschans",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.146839,
+                  "long": 4.492556
+                },
+                "urls": {
+                  "nl-NL": "/station-leiden-lammenschans",
+                  "en-GB": "/en/station-leiden-lammenschans"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "25873",
+              "stopDetails": {
+                "destination": "Leiden Centraal,Utrecht Centraal,Alphen aan den Rijn",
+                "disabledaccessibilityvisible": false,
+                "disabledaccessible": null,
+                "visuallyaccessibilityvisible": false,
+                "visuallyaccessible": null,
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93770,
+                  "Northing": 462440
+                },
+                "transports": [
+                  {
+                    "Type": "Trein",
+                    "Product": "Intercity"
+                  },
+                  {
+                    "Type": "Trein",
+                    "Product": "Sprinter"
+                  },
+                  {
+                    "Type": "Trein",
+                    "Product": "Snelbus i.p.v trein"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:38",
+              "departure": null,
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": "1",
+              "platformChange": null,
+              "location": {
+                "id": "station-leiden-centraal",
+                "type": "station",
+                "stationId": "ledn",
+                "stationType": "Station",
+                "name": "Leiden Centraal",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.166447,
+                  "long": 4.48253
+                },
+                "urls": {
+                  "nl-NL": "/station-leiden-centraal",
+                  "en-GB": "/en/station-leiden-centraal"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "9082",
+              "stopDetails": {
+                "destination": "Utrecht Centraal,Rotterdam Centraal,Den Haag Centraal,Leeuwarden,Amsterdam Centraal,Schiphol,Leiden Centraal,Vlissingen,Lelystad Centrum,Dordrecht,Amsterdam Bijlmer ArenA,Roosendaal,Hoogeveen,Enkhuizen,Den Haag,Amsterdam,Haarlem,Den Haag HS,Groningen",
+                "disabledaccessibilityvisible": false,
+                "disabledaccessible": null,
+                "visuallyaccessibilityvisible": false,
+                "visuallyaccessible": null,
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93140,
+                  "Northing": 464650
+                },
+                "transports": [
+                  {
+                    "Type": "Trein",
+                    "Product": "Stopbus i.p.v. trein"
+                  },
+                  {
+                    "Type": "Trein",
+                    "Product": "Intercity"
+                  },
+                  {
+                    "Type": "Trein",
+                    "Product": "Sprinter"
+                  },
+                  {
+                    "Type": "Trein",
+                    "Product": "Snelbus i.p.v trein"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "continuous",
+          "duration": "00:04",
+          "mode": {
+            "type": "walk",
+            "name": "Lopen als modaliteit"
+          },
+          "stops": [
+            {
+              "arrival": null,
+              "departure": null,
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "station-leiden-centraal",
+                "type": "station",
+                "stationId": "ledn",
+                "stationType": "Station",
+                "name": "Leiden Centraal",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.166447,
+                  "long": 4.48253
+                },
+                "urls": {
+                  "nl-NL": "/station-leiden-centraal",
+                  "en-GB": "/en/station-leiden-centraal"
+                }
+              },
+              "fallbackName": null,
+              "stopId": null,
+              "stopDetails": null
+            },
+            {
+              "arrival": null,
+              "departure": null,
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "leiden/bushalte-centraal",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Centraal",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.165368,
+                  "long": 4.482406
+                },
+                "urls": {
+                  "nl-NL": "/leiden/bushalte-centraal",
+                  "en-GB": "/en/leiden/bushalte-centraal"
+                }
+              },
+              "fallbackName": null,
+              "stopId": null,
+              "stopDetails": null
+            }
+          ]
+        },
+        {
+          "type": "scheduled",
+          "mode": {
+            "type": "bus",
+            "name": "Bus"
+          },
+          "destination": "Haarlem",
+          "operator": {
+            "type": "Arriva",
+            "name": "Arriva",
+            "contactpageurl": "https://www.arriva.nl/consumenten/service-contact/ik-heb-een-vraag.htm"
+          },
+          "service": "50",
+          "attributes": [],
+          "disturbancePlannerIds": [],
+          "serviceMessageIds": [],
+          "stops": [
+            {
+              "arrival": null,
+              "departure": "2017-11-17T12:50",
+              "realtimeArrival": null,
+              "realtimeDeparture": "2017-11-17T12:52",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "leiden/bushalte-centraal",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Centraal",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.165368,
+                  "long": 4.482406
+                },
+                "urls": {
+                  "nl-NL": "/leiden/bushalte-centraal",
+                  "en-GB": "/en/leiden/bushalte-centraal"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "60499",
+              "stopDetails": {
+                "destination": "Katwijk,Haarlem,Nieuw-Vennep,Alphen a/d Rijn,Schiphol Airport,Leiderdorp Alrijne Zkh,Leiderdorp Ziekenhuis",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93091,
+                  "Northing": 464530
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  },
+                  {
+                    "Type": "Bus",
+                    "Product": "Qliner"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:51",
+              "departure": "2017-11-17T12:51",
+              "realtimeArrival": "2017-11-17T12:52",
+              "realtimeDeparture": "2017-11-17T12:52",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "leiden/bushalte-cs-noordzijde-lumc",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "CS Noordzijde/LUMC",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.166433,
+                  "long": 4.48063
+                },
+                "urls": {
+                  "nl-NL": "/leiden/bushalte-cs-noordzijde-lumc",
+                  "en-GB": "/en/leiden/bushalte-cs-noordzijde-lumc"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "63958",
+              "stopDetails": {
+                "destination": "Merenwijk,Noordwijk,Katwijk,Haarlem,Nieuw-Vennep,Alphen a/d Rijn,Oegstgeest,Schiphol Airport,Leiderdorp Alrijne Zkh,Leiderdorp Ziekenhuis",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "NotAccessible",
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 92977,
+                  "Northing": 464634
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  },
+                  {
+                    "Type": "Bus",
+                    "Product": "Stadsbus"
+                  },
+                  {
+                    "Type": "Bus",
+                    "Product": "Qliner"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:52",
+              "departure": "2017-11-17T12:52",
+              "realtimeArrival": "2017-11-17T12:54",
+              "realtimeDeparture": "2017-11-17T12:54",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "leiden/bushalte-posthof",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Posthof",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.170203,
+                  "long": 4.479954
+                },
+                "urls": {
+                  "nl-NL": "/leiden/bushalte-posthof",
+                  "en-GB": "/en/leiden/bushalte-posthof"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "49466",
+              "stopDetails": {
+                "destination": "Noordwijk,Katwijk,Haarlem,Nieuw-Vennep,Oegstgeest",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 92938,
+                  "Northing": 465083
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:54",
+              "departure": "2017-11-17T12:54",
+              "realtimeArrival": "2017-11-17T12:56",
+              "realtimeDeparture": "2017-11-17T12:56",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "leiden/bushalte-lijsterstraat",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Lijsterstraat",
+                "place": {
+                  "name": "Leiden",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.173212,
+                  "long": 4.47387
+                },
+                "urls": {
+                  "nl-NL": "/leiden/bushalte-lijsterstraat",
+                  "en-GB": "/en/leiden/bushalte-lijsterstraat"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "23160",
+              "stopDetails": {
+                "destination": "Noordwijk,Haarlem",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "NotAccessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "NotAccessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 92518,
+                  "Northing": 465417
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:55",
+              "departure": "2017-11-17T12:55",
+              "realtimeArrival": "2017-11-17T12:57",
+              "realtimeDeparture": "2017-11-17T12:57",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "oegstgeest/bushalte-warmonderweg",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Warmonderweg",
+                "place": {
+                  "name": "Oegstgeest",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.176724,
+                  "long": 4.474675
+                },
+                "urls": {
+                  "nl-NL": "/oegstgeest/bushalte-warmonderweg",
+                  "en-GB": "/en/oegstgeest/bushalte-warmonderweg"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "11469",
+              "stopDetails": {
+                "destination": "Haarlem",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 92611,
+                  "Northing": 465809
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:56",
+              "departure": "2017-11-17T12:56",
+              "realtimeArrival": "2017-11-17T12:58",
+              "realtimeDeparture": "2017-11-17T12:58",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "oegstgeest/bushalte-marelaan",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Marelaan",
+                "place": {
+                  "name": "Oegstgeest",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.179086,
+                  "long": 4.478019
+                },
+                "urls": {
+                  "nl-NL": "/oegstgeest/bushalte-marelaan",
+                  "en-GB": "/en/oegstgeest/bushalte-marelaan"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "12831",
+              "stopDetails": {
+                "destination": "Haarlem",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "NotAccessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 92831,
+                  "Northing": 466063
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:57",
+              "departure": "2017-11-17T12:57",
+              "realtimeArrival": "2017-11-17T12:59",
+              "realtimeDeparture": "2017-11-17T12:59",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "oegstgeest/bushalte-abtspoelweg",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Abtspoelweg",
+                "place": {
+                  "name": "Oegstgeest",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.183179,
+                  "long": 4.484282
+                },
+                "urls": {
+                  "nl-NL": "/oegstgeest/bushalte-abtspoelweg",
+                  "en-GB": "/en/oegstgeest/bushalte-abtspoelweg"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "47177",
+              "stopDetails": {
+                "destination": "Haarlem,Oegstgeest,Oegstgeest Poelgeest",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93265,
+                  "Northing": 466501
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  },
+                  {
+                    "Type": "Bus",
+                    "Product": "Belbus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T12:58",
+              "departure": "2017-11-17T12:58",
+              "realtimeArrival": "2017-11-17T12:59",
+              "realtimeDeparture": "2017-11-17T12:59",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "oegstgeest/bushalte-president-kennedylaan",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "President Kennedylaan",
+                "place": {
+                  "name": "Oegstgeest",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.185993,
+                  "long": 4.487822
+                },
+                "urls": {
+                  "nl-NL": "/oegstgeest/bushalte-president-kennedylaan",
+                  "en-GB": "/en/oegstgeest/bushalte-president-kennedylaan"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "37902",
+              "stopDetails": {
+                "destination": "Haarlem,Sassenheim Station",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "NotAccessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "Y",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93553,
+                  "Northing": 466861
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T13:00",
+              "departure": "2017-11-17T13:00",
+              "realtimeArrival": "2017-11-17T13:01",
+              "realtimeDeparture": "2017-11-17T13:01",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "warmond/bushalte-lommerlustlaan",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Lommerlustlaan",
+                "place": {
+                  "name": "Warmond",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.191168,
+                  "long": 4.494621
+                },
+                "urls": {
+                  "nl-NL": "/warmond/bushalte-lommerlustlaan",
+                  "en-GB": "/en/warmond/bushalte-lommerlustlaan"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "44359",
+              "stopDetails": {
+                "destination": "Haarlem",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 93982,
+                  "Northing": 467390
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            },
+            {
+              "arrival": "2017-11-17T13:01",
+              "departure": "2017-11-17T13:01",
+              "realtimeArrival": "2017-11-17T13:03",
+              "realtimeDeparture": "2017-11-17T13:03",
+              "realtimeState": "offset",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "warmond/bushalte-sweilandstraat",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Sweilandstraat",
+                "place": {
+                  "name": "Warmond",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.194262,
+                  "long": 4.499737
+                },
+                "urls": {
+                  "nl-NL": "/warmond/bushalte-sweilandstraat",
+                  "en-GB": "/en/warmond/bushalte-sweilandstraat"
+                }
+              },
+              "fallbackName": null,
+              "stopId": "22789",
+              "stopDetails": {
+                "destination": "Haarlem",
+                "disabledaccessibilityvisible": true,
+                "disabledaccessible": "Accessible",
+                "visuallyaccessibilityvisible": true,
+                "visuallyaccessible": "Accessible",
+                "bicyclestorage": "N",
+                "bicyclestoragecapacity": "0",
+                "rdmcoord": {
+                  "Easting": 94303,
+                  "Northing": 467678
+                },
+                "transports": [
+                  {
+                    "Type": "Bus",
+                    "Product": "Bus"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "continuous",
+          "duration": "00:05",
+          "mode": {
+            "type": "walk",
+            "name": "Lopen als modaliteit"
+          },
+          "stops": [
+            {
+              "arrival": null,
+              "departure": null,
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "warmond/bushalte-sweilandstraat",
+                "type": "stop",
+                "stopType": "Bus stop",
+                "name": "Sweilandstraat",
+                "place": {
+                  "name": "Warmond",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.194262,
+                  "long": 4.499737
+                },
+                "urls": {
+                  "nl-NL": "/warmond/bushalte-sweilandstraat",
+                  "en-GB": "/en/warmond/bushalte-sweilandstraat"
+                }
+              },
+              "fallbackName": null,
+              "stopId": null,
+              "stopDetails": null
+            },
+            {
+              "arrival": null,
+              "departure": null,
+              "realtimeArrival": null,
+              "realtimeDeparture": null,
+              "realtimeState": "none",
+              "platform": null,
+              "platformChange": null,
+              "location": {
+                "id": "warmond/ganzenwei",
+                "type": "street",
+                "name": "Ganzenwei",
+                "place": {
+                  "name": "Warmond",
+                  "regionCode": "ZH",
+                  "regionName": "South Holland",
+                  "showRegion": false,
+                  "countryCode": "NL",
+                  "countryName": "The Netherlands",
+                  "showCountry": false
+                },
+                "latLong": {
+                  "lat": 52.197017,
+                  "long": 4.495513
+                }
+              },
+              "fallbackName": null,
+              "stopId": null,
+              "stopDetails": null
+            }
+          ]
+        }
+      ],
+      "fareInfo": {
+        "complete": true,
+        "fullPriceCents": 386,
+        "reducedPriceCents": 243,
+        "legs": [
+          {
+            "from": {
+              "id": "station-leiden-lammenschans",
+              "type": "station",
+              "stationId": "ldl",
+              "stationType": "Station",
+              "name": "Leiden Lammenschans",
+              "place": {
+                "name": "Leiden",
+                "regionCode": "ZH",
+                "regionName": "South Holland",
+                "showRegion": false,
+                "countryCode": "NL",
+                "countryName": "The Netherlands",
+                "showCountry": false
+              },
+              "latLong": {
+                "lat": 52.146839,
+                "long": 4.492556
+              },
+              "urls": {
+                "nl-NL": "/station-leiden-lammenschans",
+                "en-GB": "/en/station-leiden-lammenschans"
+              }
+            },
+            "to": {
+              "id": "station-leiden-centraal",
+              "type": "station",
+              "stationId": "ledn",
+              "stationType": "Station",
+              "name": "Leiden Centraal",
+              "place": {
+                "name": "Leiden",
+                "regionCode": "ZH",
+                "regionName": "South Holland",
+                "showRegion": false,
+                "countryCode": "NL",
+                "countryName": "The Netherlands",
+                "showCountry": false
+              },
+              "latLong": {
+                "lat": 52.166447,
+                "long": 4.48253
+              },
+              "urls": {
+                "nl-NL": "/station-leiden-centraal",
+                "en-GB": "/en/station-leiden-centraal"
+              }
+            },
+            "locationsString": "Leiden",
+            "modeTypeString": "Train",
+            "operatorString": "NS",
+            "fares": [
+              {
+                "class": "second",
+                "reduced": false,
+                "eurocents": 230
+              },
+              {
+                "class": "second",
+                "reduced": true,
+                "eurocents": 140
+              },
+              {
+                "class": "first",
+                "reduced": false,
+                "eurocents": 390
+              },
+              {
+                "class": "first",
+                "reduced": true,
+                "eurocents": 230
+              }
+            ]
+          },
+          {
+            "from": {
+              "id": "leiden/bushalte-centraal",
+              "type": "stop",
+              "stopType": "Bus stop",
+              "name": "Centraal",
+              "place": {
+                "name": "Leiden",
+                "regionCode": "ZH",
+                "regionName": "South Holland",
+                "showRegion": false,
+                "countryCode": "NL",
+                "countryName": "The Netherlands",
+                "showCountry": false
+              },
+              "latLong": {
+                "lat": 52.165368,
+                "long": 4.482406
+              },
+              "urls": {
+                "nl-NL": "/leiden/bushalte-centraal",
+                "en-GB": "/en/leiden/bushalte-centraal"
+              }
+            },
+            "to": {
+              "id": "warmond/bushalte-sweilandstraat",
+              "type": "stop",
+              "stopType": "Bus stop",
+              "name": "Sweilandstraat",
+              "place": {
+                "name": "Warmond",
+                "regionCode": "ZH",
+                "regionName": "South Holland",
+                "showRegion": false,
+                "countryCode": "NL",
+                "countryName": "The Netherlands",
+                "showCountry": false
+              },
+              "latLong": {
+                "lat": 52.194262,
+                "long": 4.499737
+              },
+              "urls": {
+                "nl-NL": "/warmond/bushalte-sweilandstraat",
+                "en-GB": "/en/warmond/bushalte-sweilandstraat"
+              }
+            },
+            "locationsString": "Leiden - Warmond",
+            "modeTypeString": "Bus",
+            "operatorString": "Arriva",
+            "fares": [
+              {
+                "class": "none",
+                "reduced": false,
+                "eurocents": 156
+              },
+              {
+                "class": "none",
+                "reduced": true,
+                "eurocents": 103
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "earlier": "/0.1/journeys?lang=en-GB&from=station-leiden-lammenschans&to=warmond%2Fganzenwei&searchType=departure&dateTime=2017-11-17T1233&sequence=1&byTrain=true&byBus=true&bySubway=true&byTram=true&byFerry=true&interchangeTime=standard&after=-1&realtime=true&planWithAccessiblity=false",
+  "later": "/0.1/journeys?lang=en-GB&from=station-leiden-lammenschans&to=warmond%2Fganzenwei&searchType=departure&dateTime=2017-11-17T1233&sequence=1&byTrain=true&byBus=true&bySubway=true&byTram=true&byFerry=true&interchangeTime=standard&before=-1&realtime=true&planWithAccessiblity=false",
+  "disturbances": [],
+  "serviceMessages": [],
+  "nearbyAddresses": [],
+  "showFeedbackForRegions": "FR,ZH,LB"
+}

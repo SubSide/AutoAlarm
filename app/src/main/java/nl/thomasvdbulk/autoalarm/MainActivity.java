@@ -1,6 +1,9 @@
 package nl.thomasvdbulk.autoalarm;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -8,26 +11,21 @@ import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.CalendarContract;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+
+import nl.thomasvdbulk.autoalarm.background.ApiRequestAlarm;
 
 public class MainActivity extends BaseActivity {
     private static final int PERMISSION_REQUEST_READ_CALENDAR = 1;
     public static final String DATA_CALENDAR_ID_KEY = "nl.thomasvdbulk.autoalarm.calendarids";
+    public static final String LOG_TAG = "AutoAlarm debugging";
 
     private boolean pickedCalendars = false;
+    private AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +36,21 @@ public class MainActivity extends BaseActivity {
                 new String[]{Manifest.permission.READ_CALENDAR},
                 PERMISSION_REQUEST_READ_CALENDAR);
 
+
+        alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ApiRequestAlarm.class);
+        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar startCalendar = Calendar.getInstance();
+//        startCalendar.add(Calendar.DAY_OF_MONTH, 1);
+//        startCalendar.add(Calendar.HOUR_OF_DAY, 4);
+//        startCalendar.add(Calendar.MINUTE, 2);
+        startCalendar.add(Calendar.SECOND, 1);
+//        startCalendar.set(Calendar.SECOND, 0);
+
+        long startTime = startCalendar.getTimeInMillis();
+
+        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, startTime, pendingIntent);
     }
 
     @Override
@@ -105,9 +118,9 @@ public class MainActivity extends BaseActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
