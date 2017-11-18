@@ -31,6 +31,7 @@ import nl.thomasvdbulk.autoalarm.MainActivity;
 import nl.thomasvdbulk.autoalarm.R;
 import nl.thomasvdbulk.autoalarm.database.AppDatabase;
 import nl.thomasvdbulk.autoalarm.database.Journey;
+import nl.thomasvdbulk.autoalarm.database.JourneyWithLegs;
 import nl.thomasvdbulk.autoalarm.database.Leg;
 import nl.thomasvdbulk.autoalarm.database.Location;
 
@@ -39,7 +40,7 @@ import static android.content.Context.POWER_SERVICE;
 public class ApiRequestAlarm extends BroadcastReceiver {
 
     public static final String WAKE_TAG = "nl.thomasvdbulk.autoalarm.WAKE_TAG";
-    public static final long WAKE_TIMEOUT = 10 * 1000;
+    public static final long WAKE_TIMEOUT = 15 * 1000;
 
     public PowerManager.WakeLock wakeLock;
     private Context context;
@@ -108,7 +109,10 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
         try {
             JSONObject obj = new JSONObject(stringBuilder.toString());
-            handleJson(obj);
+            new JsonProcessingTask().execute(obj);
+
+
+
         } catch(JSONException e){
             Log.d(MainActivity.LOG_TAG, "Error loading JSON Object", e);
         }
@@ -116,7 +120,13 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
     public void handleJson(JSONObject object) throws JSONException {
         JSONArray journeysArray = object.getJSONArray("journeys");
-        List<Journey> journeys = new ArrayList<>();
+
+
+        AppDatabase db = Room.databaseBuilder(context,
+                AppDatabase.class, "journeys").build();
+
+        db.journeyDao().deleteAll();
+
         for(int i = 0; i < journeysArray.length(); i++){
             JSONObject journeyObject = journeysArray.getJSONObject(i);
 
@@ -127,11 +137,12 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             journey.arrival = journeyObject.getString("arrival");
             journey.realArrival = journeyObject.getString("realtimeArrival");
             journey.numberOfChanges = journeyObject.getInt("numberOfChanges");
+            db.journeyDao().insert(journey);
 
             List<Leg> legs = new ArrayList<>();
 
             // Get all the intermediate places
-            JSONArray legsArray = object.getJSONArray("legs");
+            JSONArray legsArray = journeyObject.getJSONArray("legs");
             for(int j = 0; j < legsArray.length(); j++){
                 JSONObject legObject = legsArray.getJSONObject(j);
 
@@ -177,18 +188,37 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
                 leg.from = fromLoc;
                 leg.to = toLoc;
+                leg.journeyId = journey.id;
 
                 legs.add(leg);
             }
 
-            journey.legs = legs;
-
-            journeys.add(journey);
+            db.journeyDao().insert(legs.toArray(new Leg[legs.size()]));
         }
 
-        AppDatabase db = Room.databaseBuilder(context,
-                AppDatabase.class, "journeys").build();
-        db.journeyDao().insertAll(journeys.toArray(new Journey[journeys.size()]));
+    }
+
+
+    class JsonProcessingTask extends AsyncTask<JSONObject, Void, String> {
+        @Override
+        protected String doInBackground(JSONObject... objects) {
+            try {
+                handleJson(objects[0]);
+            } catch(JSONException e){
+                Log.d(MainActivity.LOG_TAG, "Error handling JSON", e);
+            }
+            return "";
+        }
+
+        @Override
+        public void onCancelled(){
+            wakeLock.release();
+        }
+
+        @Override
+        public void onPostExecute(String result){
+            wakeLock.release();
+        }
     }
 
     class HttpRequestTask extends AsyncTask<String, Void, String> {
@@ -239,17 +269,6 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
         @Override
         public void onCancelled(){
-            wakeLock.release();
-        }
-
-        @Override
-        public void onPostExecute(String result){
-            try {
-                JSONObject obj = new JSONObject(result);
-                handleJson(obj);
-            } catch(JSONException e){
-                Log.d(MainActivity.LOG_TAG, "Error loading JSON Object", e);
-            }
             wakeLock.release();
         }
     }

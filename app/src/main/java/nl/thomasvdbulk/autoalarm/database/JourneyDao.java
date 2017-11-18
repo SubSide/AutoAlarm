@@ -10,11 +10,20 @@ import java.util.List;
 @Dao
 public interface JourneyDao {
     @Query("SELECT * FROM journey")
-    List<Journey> getAll();
+    List<JourneyWithLegs> getAll();
 
     @Insert
-    void insertAll(Journey... journeys);
+    void insert(Journey... journeys);
+
+    @Insert
+    void insert(Leg... legs);
 
     @Delete
     void delete(Journey journey);
+
+    @Delete
+    void delete(Leg journey);
+
+    @Query("DELETE FROM journey")
+    void deleteAll();
 }
