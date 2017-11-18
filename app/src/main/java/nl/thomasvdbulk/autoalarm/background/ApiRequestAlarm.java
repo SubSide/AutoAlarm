@@ -1,5 +1,6 @@
 package nl.thomasvdbulk.autoalarm.background;
 
+import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.PowerManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,11 +22,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import nl.thomasvdbulk.autoalarm.MainActivity;
 import nl.thomasvdbulk.autoalarm.R;
+import nl.thomasvdbulk.autoalarm.database.AppDatabase;
+import nl.thomasvdbulk.autoalarm.database.Journey;
+import nl.thomasvdbulk.autoalarm.database.Leg;
+import nl.thomasvdbulk.autoalarm.database.Location;
 
 import static android.content.Context.POWER_SERVICE;
 
@@ -34,9 +42,11 @@ public class ApiRequestAlarm extends BroadcastReceiver {
     public static final long WAKE_TIMEOUT = 10 * 1000;
 
     public PowerManager.WakeLock wakeLock;
+    private Context context;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        this.context = context;
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_TAG);
         wakeLock.acquire(WAKE_TIMEOUT);
@@ -95,11 +105,90 @@ public class ApiRequestAlarm extends BroadcastReceiver {
                 }
             }
         }
-        Log.d(MainActivity.LOG_TAG, stringBuilder.toString());
+
+        try {
+            JSONObject obj = new JSONObject(stringBuilder.toString());
+            handleJson(obj);
+        } catch(JSONException e){
+            Log.d(MainActivity.LOG_TAG, "Error loading JSON Object", e);
+        }
     }
 
-    public void handleJson(JSONObject object){
-        Log.d(MainActivity.LOG_TAG, object.toString());
+    public void handleJson(JSONObject object) throws JSONException {
+        JSONArray journeysArray = object.getJSONArray("journeys");
+        List<Journey> journeys = new ArrayList<>();
+        for(int i = 0; i < journeysArray.length(); i++){
+            JSONObject journeyObject = journeysArray.getJSONObject(i);
+
+            // Create a new journey and fill in the information we need
+            Journey journey = new Journey();
+            journey.departure = journeyObject.getString("departure");
+            journey.realDeparture = journeyObject.getString("realtimeDeparture");
+            journey.arrival = journeyObject.getString("arrival");
+            journey.realArrival = journeyObject.getString("realtimeArrival");
+            journey.numberOfChanges = journeyObject.getInt("numberOfChanges");
+
+            List<Leg> legs = new ArrayList<>();
+
+            // Get all the intermediate places
+            JSONArray legsArray = object.getJSONArray("legs");
+            for(int j = 0; j < legsArray.length(); j++){
+                JSONObject legObject = legsArray.getJSONObject(j);
+
+                // Get the array of stops, we only need the first and the last one though
+                // as we are not interested in intermediate stops.
+                JSONArray stopsArray = legObject.getJSONArray("stops");
+                JSONObject departureObject = stopsArray.getJSONObject(0);
+                JSONObject arrivalObject = stopsArray.getJSONObject(stopsArray.length()-1);
+
+                Leg leg = new Leg();
+                leg.type = legObject.getJSONObject("mode").getString("type");
+
+                // From stuff
+                leg.departure = departureObject.getString("departure");
+                leg.realDeparture = departureObject.getString("realtimeDeparture");
+                Location fromLoc = new Location();
+                JSONObject fromLocationObject = departureObject.getJSONObject("location");
+                // We save the name as "name, place, region"
+                fromLoc.name =
+                        fromLocationObject.getJSONObject("place").getString("name") + ", " +
+                                fromLocationObject.getString("name") + ", " +
+                                fromLocationObject.getJSONObject("place").getString("regionName");
+                JSONObject fromLatLng = fromLocationObject.getJSONObject("latLong");
+                fromLoc.latitude = fromLatLng.getDouble("lat");
+                fromLoc.longitude = fromLatLng.getDouble("long");
+                fromLoc.type = fromLocationObject.getString("type");
+
+                // To stuff
+                leg.arrival = arrivalObject.getString("arrival");
+                leg.realArrival = arrivalObject.getString("realtimeArrival");
+                Location toLoc = new Location();
+                JSONObject toLocationObject = arrivalObject.getJSONObject("location");
+                // We save the name as "name, place, region"
+                toLoc.name =
+                        toLocationObject.getJSONObject("place").getString("name") + ", " +
+                                toLocationObject.getString("name") + ", " +
+                                toLocationObject.getJSONObject("place").getString("regionName");
+                JSONObject toLatLng = toLocationObject.getJSONObject("latLong");
+                toLoc.latitude = toLatLng.getDouble("lat");
+                toLoc.longitude = toLatLng.getDouble("long");
+                toLoc.type = toLocationObject.getString("type");
+
+
+                leg.from = fromLoc;
+                leg.to = toLoc;
+
+                legs.add(leg);
+            }
+
+            journey.legs = legs;
+
+            journeys.add(journey);
+        }
+
+        AppDatabase db = Room.databaseBuilder(context,
+                AppDatabase.class, "journeys").build();
+        db.journeyDao().insertAll(journeys.toArray(new Journey[journeys.size()]));
     }
 
     class HttpRequestTask extends AsyncTask<String, Void, String> {
