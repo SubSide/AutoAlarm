@@ -72,10 +72,11 @@ public class PickCalendarActivity extends BaseActivity {
                 isSelected = !isSelected;
                 view.setTag(R.string.calendar_selected, isSelected);
 
+                String id = ""+v.getTag(R.string.calendar_id);
                 if(isSelected){
-                    itemIds.add(""+view.getTag(R.string.calendar_id));
+                    itemIds.add(id);
                 } else {
-                    itemIds.remove(""+view.getTag(R.string.calendar_id));
+                    itemIds.remove(id);
                 }
 
                 // We grab the image so we can check if it is selected or not
