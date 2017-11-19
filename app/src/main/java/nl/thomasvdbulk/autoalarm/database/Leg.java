@@ -7,11 +7,12 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class Leg {
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
-    public int journeyId;
+    public long journeyId;
 
     public String type;
+    public String duration;
     public String realDeparture;
     public String departure;
     public String realArrival;

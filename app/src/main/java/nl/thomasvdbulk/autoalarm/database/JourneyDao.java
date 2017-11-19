@@ -13,10 +13,10 @@ public interface JourneyDao {
     List<JourneyWithLegs> getAll();
 
     @Insert
-    void insert(Journey... journeys);
+    long insert(Journey journeys);
 
     @Insert
-    void insert(Leg... legs);
+    long[] insert(Leg... legs);
 
     @Delete
     void delete(Journey journey);
@@ -25,5 +25,8 @@ public interface JourneyDao {
     void delete(Leg journey);
 
     @Query("DELETE FROM journey")
-    void deleteAll();
+    void deleteAllJourneys();
+
+    @Query("DELETE FROM leg")
+    void deletAllLegs();
 }

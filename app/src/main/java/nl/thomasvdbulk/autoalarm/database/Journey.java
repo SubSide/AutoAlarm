@@ -6,7 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class Journey {
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    public long id;
 
     public int numberOfChanges;
     public String realDeparture;

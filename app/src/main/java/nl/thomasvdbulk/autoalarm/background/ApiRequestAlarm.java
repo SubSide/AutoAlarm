@@ -125,7 +125,8 @@ public class ApiRequestAlarm extends BroadcastReceiver {
         AppDatabase db = Room.databaseBuilder(context,
                 AppDatabase.class, "journeys").build();
 
-        db.journeyDao().deleteAll();
+        db.journeyDao().deleteAllJourneys();
+        db.journeyDao().deletAllLegs();
 
         for(int i = 0; i < journeysArray.length(); i++){
             JSONObject journeyObject = journeysArray.getJSONObject(i);
@@ -137,7 +138,8 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             journey.arrival = journeyObject.getString("arrival");
             journey.realArrival = journeyObject.getString("realtimeArrival");
             journey.numberOfChanges = journeyObject.getInt("numberOfChanges");
-            db.journeyDao().insert(journey);
+            long id = db.journeyDao().insert(journey);
+            journey.id = id;
 
             List<Leg> legs = new ArrayList<>();
 
@@ -154,6 +156,9 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
                 Leg leg = new Leg();
                 leg.type = legObject.getJSONObject("mode").getString("type");
+                if(legObject.has("duration")){
+                    leg.duration = legObject.getString("duration");
+                }
 
                 // From stuff
                 leg.departure = departureObject.getString("departure");
