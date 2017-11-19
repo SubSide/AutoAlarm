@@ -2,31 +2,19 @@ package nl.thomasvdbulk.autoalarm;
 
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.ListActivity;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.CalendarContract;
-import android.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
@@ -51,7 +39,7 @@ public class PickCalendarActivity extends BaseActivity {
         LinearLayout linearLayout = findViewById(R.id.calendar_list);
 
         //Get the preferences
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
         itemIds = sharedPref.getStringSet(MainActivity.DATA_CALENDAR_ID_KEY, new HashSet<String>());
 
         // Load the calendars
@@ -106,8 +94,6 @@ public class PickCalendarActivity extends BaseActivity {
                 calendar.setTag(R.string.calendar_selected, false);
             }
             linearLayout.addView(calendar);
-
-            Log.d("Calendar info", cur.getString(cur.getColumnIndex(CalendarContract.Calendars.NAME)));
         }
         cur.close();
 
@@ -122,7 +108,7 @@ public class PickCalendarActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
 
         editor.putStringSet(MainActivity.DATA_CALENDAR_ID_KEY, itemIds);

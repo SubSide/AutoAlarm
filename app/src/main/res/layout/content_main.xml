@@ -8,4 +8,22 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/base_view">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <LinearLayout
+            android:id="@+id/journey_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/transparent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="#CCCCCC"
+            android:dividerHeight="1dp"
+            android:padding="2dp"
+            android:orientation="vertical">
+        </LinearLayout>
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

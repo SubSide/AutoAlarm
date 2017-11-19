@@ -12,6 +12,7 @@ public class Leg {
     public long journeyId;
 
     public String type;
+    public String service;
     public String duration;
     public String realDeparture;
     public String departure;

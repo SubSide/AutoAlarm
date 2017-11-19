@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.PowerManager;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import android.provider.AlarmClock;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -22,16 +22,18 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import nl.thomasvdbulk.autoalarm.MainActivity;
-import nl.thomasvdbulk.autoalarm.R;
 import nl.thomasvdbulk.autoalarm.database.AppDatabase;
 import nl.thomasvdbulk.autoalarm.database.Journey;
-import nl.thomasvdbulk.autoalarm.database.JourneyWithLegs;
 import nl.thomasvdbulk.autoalarm.database.Leg;
 import nl.thomasvdbulk.autoalarm.database.Location;
 
@@ -43,103 +45,122 @@ public class ApiRequestAlarm extends BroadcastReceiver {
     public static final long WAKE_TIMEOUT = 15 * 1000;
 
     public PowerManager.WakeLock wakeLock;
-    private Context context;
+
+    AppDatabase db;
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        this.context = context;
+        this.db = Room.databaseBuilder(context, AppDatabase.class, "journeys").build();
+
+        CalendarEvent calendarEvent = new CalendarEvent();
+        calendarEvent.title = intent.getStringExtra("title");
+        calendarEvent.begin = intent.getStringExtra("begin");
+        calendarEvent.location = intent.getStringExtra("location");
+
         PowerManager powerManager = (PowerManager) context.getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_TAG);
-        wakeLock.acquire(WAKE_TIMEOUT);
-
-//        Map<String, String> args = new HashMap<>();
-//        args.put("lang", "en-GB");
-//        args.put("from", "station-leiden-lammenschans");
-//        args.put("to", "warmond_ganzenwei");
-//        args.put("searchType", "departure");
-//        args.put("dateTime", "2017-11-25T1230");
-//        args.put("sequence", "1");
-//        args.put("byTrain", "true");
-//        args.put("byBus", "true");
-//        args.put("bySubway", "true");
-//        args.put("byTram", "true");
-//        args.put("byFerry", "true");
-//        args.put("interchangeTime", "standard");
-//        args.put("planWithAccessibility", "false");
-//        args.put("before", "0");
-//        args.put("after", "0");
-//        args.put("realtime", "true");
-//
-//        new HttpRequestTask().execute("-----------"+urlEncodeUTF8(args));
-
-        InputStream is = null;
-        BufferedReader br = null;
-        StringBuilder stringBuilder = new StringBuilder();
         try {
-            InputStream raw = context.getResources().openRawResource(R.raw.test);
-            is = new BufferedInputStream(raw);
-            br = new BufferedReader(new InputStreamReader(is));
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_TAG);
+            wakeLock.acquire(WAKE_TIMEOUT);
 
-            String line;
-            String newLine = System.getProperty("line.separator");
-            while ((line = br.readLine()) != null) {
-                stringBuilder.append(line);
-                stringBuilder.append(newLine);
-            }
-            br.close();
-        } catch(IOException e){
-            Log.d(MainActivity.LOG_TAG, "Error recieving API data", e);
-        } finally {
-            if(is != null){
-                try {
-                    is.close();
-                } catch(IOException e){
-                    Log.d(MainActivity.LOG_TAG, "InputStream couldn't be closed.", e);
-                }
-            }
-
-            if(br != null){
-                try {
-                    br.close();
-                } catch(IOException e){
-                    Log.d(MainActivity.LOG_TAG, "BufferedReader couldn't be closed.", e);
-                }
-            }
+            new MainProcessingTask(calendarEvent, db, wakeLock).execute(context);
+        } catch(NullPointerException e){
+            Log.d(MainActivity.LOG_TAG, "NPE thrown on acquiring wakelock", e);
         }
 
-        try {
-            JSONObject obj = new JSONObject(stringBuilder.toString());
-            new JsonProcessingTask().execute(obj);
+    }
 
 
+    static class MainProcessingTask extends AsyncTask<Context, Void, String> {
+        private CalendarEvent calendarEvent;
+        private PowerManager.WakeLock wakeLock;
+        private AppDatabase db;
 
-        } catch(JSONException e){
-            Log.d(MainActivity.LOG_TAG, "Error loading JSON Object", e);
+        MainProcessingTask(CalendarEvent calendarEvent, AppDatabase db, PowerManager.WakeLock wakeLock){
+            this.db = db;
+            this.calendarEvent = calendarEvent;
+            this.wakeLock = wakeLock;
+        }
+
+        @Override
+        protected String doInBackground(Context... contexts) {
+
+            // Create a DateFormatter object for displaying date in specified format.
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hhmm", Locale.ENGLISH);
+
+            // Create a calendar object that will convert the date and time value in milliseconds to date.
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(Long.parseLong(calendarEvent.begin));
+            String dateTime = formatter.format(calendar.getTime());
+
+            try {
+                Map<String, String> destinationArgs = new HashMap<>();
+                destinationArgs.put("address", calendarEvent.location);
+                destinationArgs.put("key", "AIzaSyDJ7wCLa4EpqPQFaiaTNCacpuc6_PEakuI");
+                String destinationUrl = "https://maps.googleapis.com/maps/api/geocode/json?" + urlEncodeUTF8(destinationArgs);
+                String fromLatLng = handleMapsJsonLookup(new JSONObject(getDataFromUrl(destinationUrl)));
+
+                Map<String, String> journeyArgs = new HashMap<>();
+                journeyArgs.put("lang", "en-GB");
+                journeyArgs.put("from", "warmond_ganzenwei");
+                journeyArgs.put("to", fromLatLng);
+                journeyArgs.put("searchType", "arrival");
+                journeyArgs.put("dateTime", dateTime);
+                journeyArgs.put("sequence", "1");
+                journeyArgs.put("byTrain", "true");
+                journeyArgs.put("byBus", "true");
+                journeyArgs.put("bySubway", "true");
+                journeyArgs.put("byTram", "true");
+                journeyArgs.put("byFerry", "true");
+                journeyArgs.put("interchangeTime", "standard");
+                journeyArgs.put("planWithAccessibility", "false");
+                journeyArgs.put("before", "0");
+                journeyArgs.put("after", "0");
+                journeyArgs.put("realtime", "true");
+                String journeyUrl = "------------?" + urlEncodeUTF8(journeyArgs);
+                handleJourneyJson(contexts[0], db, new JSONObject(getDataFromUrl(journeyUrl)));
+            } catch(JSONException e){
+                Log.d(MainActivity.LOG_TAG, "Error handling JSON Data", e);
+            }
+            return "";
+        }
+
+        @Override
+        public void onCancelled(){
+            wakeLock.release();
+        }
+
+        @Override
+        public void onPostExecute(String result){
+            wakeLock.release();
         }
     }
 
-    public void handleJson(JSONObject object) throws JSONException {
+    public static String handleMapsJsonLookup(JSONObject data) throws JSONException {
+        JSONObject location = data.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+        return location.getString("lat")+","+location.getString("lng");
+    }
+
+    public static void handleJourneyJson(Context context, AppDatabase db, JSONObject object) throws JSONException {
         JSONArray journeysArray = object.getJSONArray("journeys");
-
-
-        AppDatabase db = Room.databaseBuilder(context,
-                AppDatabase.class, "journeys").build();
 
         db.journeyDao().deleteAllJourneys();
         db.journeyDao().deletAllLegs();
+
+        Journey journey = null;
 
         for(int i = 0; i < journeysArray.length(); i++){
             JSONObject journeyObject = journeysArray.getJSONObject(i);
 
             // Create a new journey and fill in the information we need
-            Journey journey = new Journey();
+            journey = new Journey();
             journey.departure = journeyObject.getString("departure");
             journey.realDeparture = journeyObject.getString("realtimeDeparture");
             journey.arrival = journeyObject.getString("arrival");
             journey.realArrival = journeyObject.getString("realtimeArrival");
             journey.numberOfChanges = journeyObject.getInt("numberOfChanges");
-            long id = db.journeyDao().insert(journey);
-            journey.id = id;
+            journey.id = db.journeyDao().insert(journey);
 
             List<Leg> legs = new ArrayList<>();
 
@@ -158,6 +179,10 @@ public class ApiRequestAlarm extends BroadcastReceiver {
                 leg.type = legObject.getJSONObject("mode").getString("type");
                 if(legObject.has("duration")){
                     leg.duration = legObject.getString("duration");
+                }
+
+                if(legObject.has("service")){
+                    leg.service = legObject.getString("service");
                 }
 
                 // From stuff
@@ -181,10 +206,13 @@ public class ApiRequestAlarm extends BroadcastReceiver {
                 Location toLoc = new Location();
                 JSONObject toLocationObject = arrivalObject.getJSONObject("location");
                 // We save the name as "name, place, region"
-                toLoc.name =
-                        toLocationObject.getJSONObject("place").getString("name") + ", " +
-                                toLocationObject.getString("name") + ", " +
-                                toLocationObject.getJSONObject("place").getString("regionName");
+                if(toLocationObject.has("place")) {
+                    toLoc.name = toLocationObject.getJSONObject("place").getString("name") + ", " +
+                            toLocationObject.getString("name") + ", " +
+                            toLocationObject.getJSONObject("place").getString("regionName");
+                } else {
+                    toLoc.name = "Your destination!";
+                }
                 JSONObject toLatLng = toLocationObject.getJSONObject("latLong");
                 toLoc.latitude = toLatLng.getDouble("lat");
                 toLoc.longitude = toLatLng.getDouble("long");
@@ -201,84 +229,74 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             db.journeyDao().insert(legs.toArray(new Leg[legs.size()]));
         }
 
+        if(journey == null)
+            return;
+
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm", Locale.ENGLISH);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(formatter.parse(journey.departure));
+            cal.add(Calendar.HOUR_OF_DAY, -1);
+
+            Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
+            intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+            intent.putExtra(AlarmClock.EXTRA_HOUR, cal.get(Calendar.HOUR_OF_DAY));
+            intent.putExtra(AlarmClock.EXTRA_MINUTES, cal.get(Calendar.MINUTE));
+            intent.putExtra(AlarmClock.EXTRA_MESSAGE, "Good morning!");
+
+            context.startActivity(intent);
+        } catch(ParseException e){
+            Log.d(MainActivity.LOG_TAG, "Problem converting date to a calendar!", e);
+        }
+
     }
 
+    public static String getDataFromUrl(String urlString){
+        Log.d(MainActivity.LOG_TAG, urlString);
+        HttpURLConnection urlConnection = null;
+        InputStream is = null;
+        BufferedReader br = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            URL url = new URL(urlString);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            is = new BufferedInputStream(urlConnection.getInputStream());
+            br = new BufferedReader(new InputStreamReader(is));
 
-    class JsonProcessingTask extends AsyncTask<JSONObject, Void, String> {
-        @Override
-        protected String doInBackground(JSONObject... objects) {
-            try {
-                handleJson(objects[0]);
-            } catch(JSONException e){
-                Log.d(MainActivity.LOG_TAG, "Error handling JSON", e);
+            String line;
+            String newLine = System.getProperty("line.separator");
+            while ((line = br.readLine()) != null) {
+                stringBuilder.append(line);
+                stringBuilder.append(newLine);
             }
-            return "";
-        }
+            br.close();
+        } catch(IOException e){
+            Log.d(MainActivity.LOG_TAG, "Error recieving API data", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
 
-        @Override
-        public void onCancelled(){
-            wakeLock.release();
-        }
-
-        @Override
-        public void onPostExecute(String result){
-            wakeLock.release();
-        }
-    }
-
-    class HttpRequestTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... strings) {
-            HttpURLConnection urlConnection = null;
-            InputStream is = null;
-            BufferedReader br = null;
-            StringBuilder stringBuilder = new StringBuilder();
-            try {
-                URL url = new URL(strings[0]);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                is = new BufferedInputStream(urlConnection.getInputStream());
-                br = new BufferedReader(new InputStreamReader(is));
-
-                String line;
-                String newLine = System.getProperty("line.separator");
-                while ((line = br.readLine()) != null) {
-                    stringBuilder.append(line);
-                    stringBuilder.append(newLine);
-                }
-                br.close();
-            } catch(IOException e){
-                Log.d(MainActivity.LOG_TAG, "Error recieving API data", e);
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-
-                if(is != null){
-                    try {
-                        is.close();
-                    } catch(IOException e){
-                        Log.d(MainActivity.LOG_TAG, "InputStream couldn't be closed.", e);
-                    }
-                }
-
-                if(br != null){
-                    try {
-                        br.close();
-                    } catch(IOException e){
-                        Log.d(MainActivity.LOG_TAG, "BufferedReader couldn't be closed.", e);
-                    }
+            if(is != null){
+                try {
+                    is.close();
+                } catch(IOException e){
+                    Log.d(MainActivity.LOG_TAG, "InputStream couldn't be closed.", e);
                 }
             }
-            return stringBuilder.toString();
-        }
 
-        @Override
-        public void onCancelled(){
-            wakeLock.release();
+            if(br != null){
+                try {
+                    br.close();
+                } catch(IOException e){
+                    Log.d(MainActivity.LOG_TAG, "BufferedReader couldn't be closed.", e);
+                }
+            }
         }
+        return stringBuilder.toString();
     }
 
-    private String urlEncodeUTF8(Map<String, String> map) {
+    private static String urlEncodeUTF8(Map<String, String> map) {
         StringBuilder sb = new StringBuilder();
         try {
             for (Map.Entry<String, String> entry : map.entrySet()) {

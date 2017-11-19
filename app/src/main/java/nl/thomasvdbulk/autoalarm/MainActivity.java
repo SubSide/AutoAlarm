@@ -3,111 +3,145 @@ package nl.thomasvdbulk.autoalarm;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.arch.persistence.room.Room;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.icu.util.Calendar;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.Set;
 
 import nl.thomasvdbulk.autoalarm.background.ApiRequestAlarm;
+import nl.thomasvdbulk.autoalarm.background.CalendarEvent;
+import nl.thomasvdbulk.autoalarm.database.AppDatabase;
+import nl.thomasvdbulk.autoalarm.database.Journey;
+import nl.thomasvdbulk.autoalarm.database.JourneyWithLegs;
+import nl.thomasvdbulk.autoalarm.database.Leg;
 
 public class MainActivity extends BaseActivity {
-    private static final int PERMISSION_REQUEST_READ_CALENDAR = 1;
+    private static final int PERMISSION_REQUEST_PERMISSIONS = 1;
+    public static final String DATA_SHARED_FILE = "calendarIds";
     public static final String DATA_CALENDAR_ID_KEY = "nl.thomasvdbulk.autoalarm.calendarids";
     public static final String LOG_TAG = "AutoAlarm debugging";
 
     private boolean pickedCalendars = false;
-    private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
+    private Set<String> calendarIds;
+
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.content_main);
 
+        db = Room.databaseBuilder(this, AppDatabase.class, "journeys").build();
+
+        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
+        if(sharedPref.contains(MainActivity.DATA_CALENDAR_ID_KEY)){
+            calendarIds = sharedPref.getStringSet(MainActivity.DATA_CALENDAR_ID_KEY, new HashSet<String>());
+            pickedCalendars = true;
+        } else {
+            calendarIds = new HashSet<>();
+        }
+
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_CALENDAR},
-                PERMISSION_REQUEST_READ_CALENDAR);
-
-
-        alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, ApiRequestAlarm.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Calendar startCalendar = Calendar.getInstance();
-//        startCalendar.add(Calendar.DAY_OF_MONTH, 1);
-//        startCalendar.add(Calendar.HOUR_OF_DAY, 4);
-//        startCalendar.add(Calendar.MINUTE, 2);
-        startCalendar.add(Calendar.SECOND, 1);
-//        startCalendar.set(Calendar.SECOND, 0);
-
-        long startTime = startCalendar.getTimeInMillis();
-
-        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, startTime, pendingIntent);
+                new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WAKE_LOCK, Manifest.permission.SET_ALARM},
+                PERMISSION_REQUEST_PERMISSIONS);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_READ_CALENDAR: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if(!pickedCalendars) {
-                        shouldPickCalendars();
-                    }
-                } else {
-                    //TODO Shit, we don't have permissions
-                }
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode != PERMISSION_REQUEST_PERMISSIONS) {
+            return;
+        }
+
+        for(int i = 0; i < permissions.length; i++){
+            if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this.getApplicationContext(), "We need calendar permissions to read out the events!", Toast.LENGTH_LONG).show();
+                finish();
                 return;
             }
         }
+
+        setAlarmOnFirstEvent(calendarIds);
+        showEvents();
     }
 
-    public void shouldPickCalendars(){
-        if(pickedCalendars){
+    public void showEvents(){
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this.getApplicationContext(), "We need calendar permissions to read out the events!", Toast.LENGTH_LONG).show();
+            finish();
             return;
         }
 
+        if(!pickedCalendars) {
+            Intent intent = new Intent(this, PickCalendarActivity.class);
+            startActivity(intent);
+            return;
+        }
+
+        new AsyncViewLoader(this).execute(db);
+    }
+
+    public void setAlarmOnFirstEvent(Set<String> calendarIds){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED){
             return;
         }
 
-        Intent intent = new Intent(this, PickCalendarActivity.class);
-        startActivity(intent);
-    }
-
-    public void retrieveEvents(){
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED){
-            return;
-        }
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.add(Calendar.HOUR_OF_DAY, 1);
         long startDay = calendar.getTimeInMillis();
-        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         long endDay = calendar.getTimeInMillis();
 
-        String[] projection = new String[] { BaseColumns._ID, CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE, CalendarContract.Instances.DTSTART };
-        String selection = CalendarContract.Instances.DTSTART + " >= ? AND " + CalendarContract.Instances.DTSTART + "<= ?";
-        String[] selectionArgs = new String[] { Long.toString(startDay), Long.toString(endDay) };
 
-        Cursor cur = getContentResolver().query(CalendarContract.Events.CONTENT_URI, projection, selection, selectionArgs, null);
-        while(cur.moveToNext()){
-            Log.d("Calendar info", cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE)));
+        String[] projection = new String[] { BaseColumns._ID, CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.EVENT_LOCATION };
+
+        String selection = CalendarContract.Instances.CALENDAR_ID + " IN ("+makePlaceholders(calendarIds.size()) + ")";
+        String[] selectionArgs = calendarIds.toArray(new String[calendarIds.size()]);
+
+        String order = CalendarContract.Instances.BEGIN+" ASC LIMIT 1";
+
+        Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
+        ContentUris.appendId(builder, startDay);
+        ContentUris.appendId(builder, endDay);
+
+
+        Cursor cur = getContentResolver().query(builder.build(), projection, selection, selectionArgs, order);
+        if(cur.moveToNext()) {
+            CalendarEvent event = new CalendarEvent();
+            event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
+            event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
+            event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
+            setAlarm(event);
         }
+
+        cur.close();
     }
 
     @Override
@@ -123,5 +157,85 @@ public class MainActivity extends BaseActivity {
 //        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    String makePlaceholders(int len) {
+        if (len < 1) {
+            return "";
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
+    }
+
+    public void setAlarm(CalendarEvent event){
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ApiRequestAlarm.class);
+        intent.putExtra("title", event.title);
+        intent.putExtra("begin", event.begin);
+        intent.putExtra("location", event.location);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar startCalendar = Calendar.getInstance();
+        if(startCalendar.get(Calendar.HOUR_OF_DAY) >= 20){
+            startCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        startCalendar.set(Calendar.MINUTE, 0);
+        startCalendar.add(Calendar.SECOND, new Random().nextInt(60));
+
+        long startTime = startCalendar.getTimeInMillis();
+
+        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, startTime, pendingIntent);
+    }
+
+    static class AsyncViewLoader extends AsyncTask<AppDatabase, Void, List<JourneyWithLegs>> {
+
+        private MainActivity main;
+
+        public AsyncViewLoader(MainActivity main){
+            super();
+            this.main = main;
+        }
+
+        @Override
+        protected List<JourneyWithLegs> doInBackground(AppDatabase... dbs) {
+            return dbs[0].journeyDao().getAll();
+        }
+
+        @Override
+        protected void onPostExecute(List<JourneyWithLegs> list) {
+            if(list.size() < 1)
+                return;
+            LayoutInflater inflater = (LayoutInflater)main.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LinearLayout linearLayout = main.findViewById(R.id.journey_list);
+            Journey journey = list.get(0).journey;
+            List<Leg> legs = list.get(0).legs;
+            for(Leg leg : legs) {
+                // Create a new view
+                View legView = inflater.inflate(R.layout.journey_list_item, null);
+
+                // Set the text to the calendar name
+                ((TextView)legView.findViewById(R.id.type)).setText(leg.type+" "+leg.service);
+                ((TextView)legView.findViewById(R.id.duration)).setText(leg.duration);
+                ((TextView)legView.findViewById(R.id.from)).setText(leg.from.name);
+                ((TextView)legView.findViewById(R.id.from_time)).setText(formatDate(leg.departure));
+                ((TextView)legView.findViewById(R.id.to)).setText(leg.to.name);
+                ((TextView)legView.findViewById(R.id.to_time)).setText(formatDate(leg.arrival));
+
+                linearLayout.addView(legView);
+            }
+        }
+
+        public String formatDate(String date){
+            if(date == null || !date.contains("T"))
+                return "";
+
+            return date.split("T")[1];
+        }
     }
 }
