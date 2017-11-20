@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -105,13 +106,21 @@ public class MainActivity extends BaseActivity {
         new AsyncViewLoader(this).execute(db);
     }
 
+    private Calendar getCalendarAtMidnight(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        return calendar;
+    }
+
     public void setAlarmOnFirstEvent(Set<String> calendarIds){
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED){
             return;
         }
 
 
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = getCalendarAtMidnight();
         long startDay = calendar.getTimeInMillis();
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
@@ -121,31 +130,32 @@ public class MainActivity extends BaseActivity {
 
         Cursor cur = getCursorFromTo(startDay, endDay);
 
-        if(cur.moveToNext()){
-            // Check if it's necessary to set a timer now, or tomorrow
-            if(cur.getLong(cur.getColumnIndex(CalendarContract.Instances.BEGIN)) < Calendar.getInstance().getTimeInMillis() - timeToWakeUp){
+        // Check if it's necessary to set a timer now, or tomorrow
+        if(!cur.moveToNext() || // If we can't find any events today
+                // We also check if the begin of the first event of the day, is earlier than the current time, plus some time to wake up
+                cur.getLong(cur.getColumnIndex(CalendarContract.Instances.BEGIN)) < Calendar.getInstance().getTimeInMillis() + timeToWakeUp){
 
-                calendar = Calendar.getInstance();
-                calendar.add(Calendar.DATE, 1);
-                startDay = calendar.getTimeInMillis();
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
-                endDay = calendar.getTimeInMillis();
-                cur = getCursorFromTo(startDay, endDay);
-                if(!cur.moveToNext()){
-                    cur.close();
-                    return;
-                }
+            // If one of these are true, we will look for a next event
+            calendar = getCalendarAtMidnight();
+            calendar.add(Calendar.DATE, 1);
+            startDay = calendar.getTimeInMillis();
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            endDay = calendar.getTimeInMillis();
+            cur = getCursorFromTo(startDay, endDay);
+            if(!cur.moveToNext()){
+                cur.close();
+                return;
             }
-
-
-            CalendarEvent event = new CalendarEvent();
-            event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
-            event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
-            event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
-            setAlarm(calendar, event);
         }
+
+
+        CalendarEvent event = new CalendarEvent();
+        event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
+        event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
+        event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
+        setAlarm(calendar, event);
 
         cur.close();
     }
@@ -209,6 +219,8 @@ public class MainActivity extends BaseActivity {
         calendar.add(Calendar.SECOND, new Random().nextInt(60));
 
         long startTime = calendar.getTimeInMillis();
+
+        Log.d(MainActivity.LOG_TAG, "Alarm intent will start at: "+(new Date(startTime).toString()));
 
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, startTime, pendingIntent);
     }
