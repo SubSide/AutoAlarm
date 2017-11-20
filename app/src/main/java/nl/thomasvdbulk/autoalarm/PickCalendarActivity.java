@@ -54,11 +54,10 @@ public class PickCalendarActivity extends BaseActivity {
         View.OnClickListener listener = new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                TextView view = v.findViewById(R.id.item);
-                boolean isSelected = view.getTag(R.string.calendar_selected) != null && (boolean)view.getTag(R.string.calendar_selected);
+                boolean isSelected = v.getTag(R.string.calendar_selected) != null && (boolean)v.getTag(R.string.calendar_selected);
                 // If the tag is null or false, we set it to true and the other way around.
                 isSelected = !isSelected;
-                view.setTag(R.string.calendar_selected, isSelected);
+                v.setTag(R.string.calendar_selected, isSelected);
 
                 String id = ""+v.getTag(R.string.calendar_id);
                 if(isSelected){
