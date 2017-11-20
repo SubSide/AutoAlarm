@@ -23,27 +23,6 @@
             android:divider="#CCCCCC"
             android:dividerHeight="1dp"
             android:orientation="vertical">
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <include layout="@layout/journey_list_preview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
     <android.support.design.widget.FloatingActionButton

@@ -148,7 +148,8 @@ public class MainActivity extends BaseActivity {
                 LinearLayout linearLayout = findViewById(R.id.journey_list);
                 linearLayout.removeAllViews();
                 List<Leg> legs = journeyWithLegsList.get(0).legs;
-                for(Leg leg : legs) {
+                for(int i = 0; i < legs.size(); i++) {
+                    Leg leg = legs.get(i);
                     // Create a new view
                     View legView = inflater.inflate(R.layout.journey_list_item, null);
 
@@ -159,6 +160,10 @@ public class MainActivity extends BaseActivity {
                     ((TextView)legView.findViewById(R.id.from_time)).setText(formatDate(leg.departure));
                     ((TextView)legView.findViewById(R.id.to)).setText(leg.to.name);
                     ((TextView)legView.findViewById(R.id.to_time)).setText(formatDate(leg.arrival));
+
+                    // Alternate it!
+                    if(i % 2 == 0)
+                        legView.setBackgroundColor(getColor(R.color.tableAlternate));
 
                     linearLayout.addView(legView);
                 }

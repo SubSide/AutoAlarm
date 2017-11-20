@@ -21,6 +21,5 @@
         android:src="@drawable/checked"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginRight="5dp"
         android:layout_marginEnd="5dp" />
 </LinearLayout>
