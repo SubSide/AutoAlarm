@@ -65,13 +65,12 @@ public abstract class BaseActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-//        if (id == R.id.nav_settings) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_info) {
-//            Intent intent = new Intent(this, InfoActivity.class);
-//            startActivity(intent);
-//        }
-        // And more
+        if (id == R.id.nav_settings) {
+            //
+        } else if(id == R.id.nav_calendar){
+            Intent intent = new Intent(this, PickCalendarActivity.class);
+            startActivity(intent);
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
