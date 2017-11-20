@@ -148,6 +148,7 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
 
                 Leg leg = new Leg();
                 leg.type = legObject.getJSONObject("mode").getString("type");
+
                 if(legObject.has("duration")){
                     leg.duration = legObject.getString("duration");
                 }
@@ -226,15 +227,24 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
             Calendar cal = Calendar.getInstance();
             cal.setTime(formatter.parse(journey.departure));
             String time = timeFormatter.format(cal.getTime());
+            int minutes = cal.get(Calendar.MINUTE);
+            minutes = (int)Math.floor(minutes / 5) * 5; // We round DOWN to the 5s because it looks nicer
+            cal.set(Calendar.MINUTE, minutes);
 
-            cal.add(Calendar.HOUR_OF_DAY, -1);
+            cal.add(Calendar.HOUR_OF_DAY, -1); // TODO SharedPreferences hour subtraction
 
             Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
-            intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
             intent.putExtra(AlarmClock.EXTRA_HOUR, cal.get(Calendar.HOUR_OF_DAY));
             intent.putExtra(AlarmClock.EXTRA_MINUTES, cal.get(Calendar.MINUTE));
-            intent.putExtra(AlarmClock.EXTRA_DAYS, cal.get(Calendar.DAY_OF_WEEK));
+            ArrayList<Integer> days = new ArrayList<>();
+            days.add(cal.get(Calendar.DAY_OF_WEEK));
+            intent.putExtra(AlarmClock.EXTRA_DAYS, days);
             intent.putExtra(AlarmClock.EXTRA_MESSAGE, "Good morning!");
+
+            // Skip the UI because we don't want to go to the alarm
+            intent.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+            // Set vibration to true
+            intent.putExtra(AlarmClock.EXTRA_VIBRATE, true);
 
             context.startActivity(intent);
 
@@ -248,6 +258,7 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
                     }
 
                     type = leg.type;
+                    time = timeFormatter.format(formatter.parse(leg.departure));
 
                     if(leg.service != null)
                         type += " " + leg.service;
@@ -329,13 +340,15 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
 
     private static void sendNotifcation(Context context, String alarmTime, String time, String reach){
 
-        String text = "Automatic alarm set at "+alarmTime+" to get " + reach + " at " + time + "\n" +
+        String smallText = "Alarm set at " + alarmTime + "!";
+        String text = "An alarm has automatically been set at "+alarmTime+" to get " + reach + " at " + time + ".\n\n" +
                 "Don't be late!! :)";
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context, ApiRequestAlarm.NOTIFICATION_TAG)
                         .setSmallIcon(R.drawable.notification_icon)
                         .setContentTitle(context.getString(R.string.notification_title))
-                        .setContentText(text);
+                        .setContentText(smallText)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(context, MainActivity.class);
 
