@@ -18,6 +18,7 @@ import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,7 @@ public class MainActivity extends BaseActivity {
 
     private boolean pickedCalendars = false;
     private Set<String> calendarIds;
+    private long timeToWakeUp = 60 * 60 * 1000;
 
     AppDatabase db;
 
@@ -110,7 +112,6 @@ public class MainActivity extends BaseActivity {
 
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.HOUR_OF_DAY, 1);
         long startDay = calendar.getTimeInMillis();
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
@@ -118,6 +119,38 @@ public class MainActivity extends BaseActivity {
         long endDay = calendar.getTimeInMillis();
 
 
+        Cursor cur = getCursorFromTo(startDay, endDay);
+
+        if(cur.moveToNext()){
+            // Check if it's necessary to set a timer now, or tomorrow
+            if(cur.getLong(cur.getColumnIndex(CalendarContract.Instances.BEGIN)) < Calendar.getInstance().getTimeInMillis() - timeToWakeUp){
+
+                calendar = Calendar.getInstance();
+                calendar.add(Calendar.DATE, 1);
+                startDay = calendar.getTimeInMillis();
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                endDay = calendar.getTimeInMillis();
+                cur = getCursorFromTo(startDay, endDay);
+                if(!cur.moveToNext()){
+                    cur.close();
+                    return;
+                }
+            }
+
+
+            CalendarEvent event = new CalendarEvent();
+            event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
+            event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
+            event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
+            setAlarm(calendar, event);
+        }
+
+        cur.close();
+    }
+
+    public Cursor getCursorFromTo(long startDay, long endDay){
         String[] projection = new String[] { BaseColumns._ID, CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.EVENT_LOCATION };
 
         String selection = CalendarContract.Instances.CALENDAR_ID + " IN ("+makePlaceholders(calendarIds.size()) + ")";
@@ -130,16 +163,8 @@ public class MainActivity extends BaseActivity {
         ContentUris.appendId(builder, endDay);
 
 
-        Cursor cur = getContentResolver().query(builder.build(), projection, selection, selectionArgs, order);
-        if(cur.moveToNext()) {
-            CalendarEvent event = new CalendarEvent();
-            event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
-            event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
-            event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
-            setAlarm(event);
-        }
+        return getContentResolver().query(builder.build(), projection, selection, selectionArgs, order);
 
-        cur.close();
     }
 
     @Override
@@ -170,7 +195,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    public void setAlarm(CalendarEvent event){
+    public void setAlarm(Calendar calendar, CalendarEvent event){
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, ApiRequestAlarm.class);
         intent.putExtra("title", event.title);
@@ -178,14 +203,12 @@ public class MainActivity extends BaseActivity {
         intent.putExtra("location", event.location);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Calendar startCalendar = Calendar.getInstance();
-        startCalendar.add(Calendar.DAY_OF_MONTH, 1);
-        startCalendar.set(Calendar.AM_PM, Calendar.AM);
-        startCalendar.set(Calendar.HOUR, 0);
-        startCalendar.set(Calendar.MINUTE, 0);
-        startCalendar.add(Calendar.SECOND, new Random().nextInt(60));
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.add(Calendar.SECOND, new Random().nextInt(60));
 
-        long startTime = startCalendar.getTimeInMillis();
+        long startTime = calendar.getTimeInMillis();
 
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC, startTime, pendingIntent);
     }
