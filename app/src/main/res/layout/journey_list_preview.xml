@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    android:padding="10dp"
-    tools:showIn="@layout/content_main">
+    android:padding="10dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,11 +16,13 @@
             android:id="@+id/type"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="walk null"/>
         <TextView
             android:id="@+id/duration"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="00:05"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,11 +32,13 @@
             android:id="@+id/from"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="Warmond, Ganzenwei, South Holland" />
         <TextView
             android:id="@+id/from_time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="11:43" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,10 +48,12 @@
             android:id="@+id/to"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="Warmond, Sweilandstraat, South Holland" />
         <TextView
             android:id="@+id/to_time"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="11:48" />
     </LinearLayout>
 </LinearLayout>
