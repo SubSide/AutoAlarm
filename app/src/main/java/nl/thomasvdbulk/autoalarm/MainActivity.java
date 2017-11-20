@@ -111,7 +111,8 @@ public class MainActivity extends BaseActivity {
 //
 //        this.registerReceiver(mReceiver, intentFilter);
 
-        showEvents();
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED)
+            showEvents();
     }
 
     @Override
