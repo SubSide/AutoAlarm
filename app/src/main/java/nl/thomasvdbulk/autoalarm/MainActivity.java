@@ -18,7 +18,6 @@ import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -41,6 +38,7 @@ import nl.thomasvdbulk.autoalarm.database.JourneyWithLegs;
 import nl.thomasvdbulk.autoalarm.database.Leg;
 
 public class MainActivity extends BaseActivity {
+    public static final int NOTIFICATION_UID = 1337;
     private static final int PERMISSION_REQUEST_PERMISSIONS = 1;
     public static final String DATA_SHARED_FILE = "calendarIds";
     public static final String DATA_CALENDAR_ID_KEY = "nl.thomasvdbulk.autoalarm.calendarids";
@@ -181,10 +179,9 @@ public class MainActivity extends BaseActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar startCalendar = Calendar.getInstance();
-        if(startCalendar.get(Calendar.HOUR_OF_DAY) >= 20){
-            startCalendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-        startCalendar.set(Calendar.HOUR_OF_DAY, 0);
+        startCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        startCalendar.set(Calendar.AM_PM, Calendar.AM);
+        startCalendar.set(Calendar.HOUR, 0);
         startCalendar.set(Calendar.MINUTE, 0);
         startCalendar.add(Calendar.SECOND, new Random().nextInt(60));
 

@@ -15,4 +15,5 @@
 
     <string name="calendar_id">Calendar id</string>
     <string name="calendar_selected">Calendar selected</string>
+    <string name="notification_title">AutoAlarm - Alarm set!</string>
 </resources>

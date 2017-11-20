@@ -1,5 +1,9 @@
 package nl.thomasvdbulk.autoalarm.background;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,6 +11,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.provider.AlarmClock;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -32,6 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nl.thomasvdbulk.autoalarm.MainActivity;
+import nl.thomasvdbulk.autoalarm.R;
 import nl.thomasvdbulk.autoalarm.database.AppDatabase;
 import nl.thomasvdbulk.autoalarm.database.Journey;
 import nl.thomasvdbulk.autoalarm.database.Leg;
@@ -41,13 +47,13 @@ import static android.content.Context.POWER_SERVICE;
 
 public class ApiRequestAlarm extends BroadcastReceiver {
 
+    public static final String NOTIFICATION_TAG = "nl.thomasvdbulk.autoalarm.NOTIFICATION_TAG";
     public static final String WAKE_TAG = "nl.thomasvdbulk.autoalarm.WAKE_TAG";
     public static final long WAKE_TIMEOUT = 15 * 1000;
 
     public PowerManager.WakeLock wakeLock;
 
     AppDatabase db;
-
 
 
     @Override
@@ -128,12 +134,14 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
         @Override
         public void onCancelled(){
-            wakeLock.release();
+            if(wakeLock.isHeld())
+                wakeLock.release();
         }
 
         @Override
         public void onPostExecute(String result){
-            wakeLock.release();
+            if(wakeLock.isHeld())
+                wakeLock.release();
         }
     }
 
@@ -149,6 +157,7 @@ public class ApiRequestAlarm extends BroadcastReceiver {
         db.journeyDao().deletAllLegs();
 
         Journey journey = null;
+        List<Leg> legs = null;
 
         for(int i = 0; i < journeysArray.length(); i++){
             JSONObject journeyObject = journeysArray.getJSONObject(i);
@@ -162,7 +171,7 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             journey.numberOfChanges = journeyObject.getInt("numberOfChanges");
             journey.id = db.journeyDao().insert(journey);
 
-            List<Leg> legs = new ArrayList<>();
+            legs = new ArrayList<>();
 
             // Get all the intermediate places
             JSONArray legsArray = journeyObject.getJSONArray("legs");
@@ -233,9 +242,12 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             return;
 
         try {
+            SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm", Locale.ENGLISH);
             Calendar cal = Calendar.getInstance();
             cal.setTime(formatter.parse(journey.departure));
+            String time = timeFormatter.format(cal.getTime());
+
             cal.add(Calendar.HOUR_OF_DAY, -1);
 
             Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
@@ -245,6 +257,28 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             intent.putExtra(AlarmClock.EXTRA_MESSAGE, "Good morning!");
 
             context.startActivity(intent);
+
+            String alarmTime = timeFormatter.format(cal.getTime());
+
+            String type = "";
+            if(legs != null) {
+                for (Leg leg : legs) {
+                    if (leg.type.equalsIgnoreCase("walk")) {
+                        continue;
+                    }
+
+                    type = leg.type;
+
+                    if(leg.service != null)
+                        type += " " + leg.service;
+                    break;
+                }
+            } else {
+                type = "O.o";
+            }
+
+
+            sendNotifcation(context, alarmTime, time, type);
         } catch(ParseException e){
             Log.d(MainActivity.LOG_TAG, "Problem converting date to a calendar!", e);
         }
@@ -312,5 +346,41 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             Log.d(MainActivity.LOG_TAG, "Encoding type is not supported!", e);
         }
         return sb.toString();
+    }
+
+    private static void sendNotifcation(Context context, String alarmTime, String time, String reach){
+
+        String text = "Automatic alarm set at "+alarmTime+" to get " + reach + " at " + time + "\n" +
+                "Don't be late!! :)";
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context, NOTIFICATION_TAG)
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentTitle(context.getString(R.string.notification_title))
+                        .setContentText(text);
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(context, MainActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your app to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // mNotificationId is a unique integer your app uses to identify the
+        // notification. For example, to cancel the notification, you can pass its ID
+        // number to NotificationManager.cancel().
+        mNotificationManager.notify(MainActivity.NOTIFICATION_UID, mBuilder.build());
     }
 }
