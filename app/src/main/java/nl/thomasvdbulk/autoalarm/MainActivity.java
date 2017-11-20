@@ -7,7 +7,6 @@ import android.arch.persistence.room.Room;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.icu.util.Calendar;
@@ -17,13 +16,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -154,7 +151,14 @@ public class MainActivity extends BaseActivity {
                     View legView = inflater.inflate(R.layout.journey_list_item, null);
 
                     // Set the text to the calendar name
-                    ((TextView)legView.findViewById(R.id.type)).setText(leg.type+" "+leg.service);
+                    String type = leg.type;
+                    if(leg.service != null){
+                        type += " " + leg.service;
+                    }
+
+                    type = type.substring(0, 1).toUpperCase() + type.substring(1);
+
+                    ((TextView)legView.findViewById(R.id.type)).setText(type);
                     ((TextView)legView.findViewById(R.id.duration)).setText(leg.duration);
                     ((TextView)legView.findViewById(R.id.from)).setText(leg.from.name);
                     ((TextView)legView.findViewById(R.id.from_time)).setText(formatDate(leg.departure));

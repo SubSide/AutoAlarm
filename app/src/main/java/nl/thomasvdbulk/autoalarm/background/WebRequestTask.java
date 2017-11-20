@@ -152,10 +152,6 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
                     leg.duration = legObject.getString("duration");
                 }
 
-                if(legObject.has("service")){
-                    leg.service = legObject.getString("service");
-                }
-
                 // From stuff
                 leg.departure = departureObject.getString("departure");
                 leg.realDeparture = departureObject.getString("realtimeDeparture");
@@ -188,6 +184,16 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
                 toLoc.latitude = toLatLng.getDouble("lat");
                 toLoc.longitude = toLatLng.getDouble("long");
                 toLoc.type = toLocationObject.getString("type");
+
+
+                // Now we add some stuff for later
+
+                if(leg.type.equalsIgnoreCase("train")){
+                    leg.service = "platform " + departureObject.getString("platform") +" -> "+arrivalObject.getString("platform");
+                } else if(legObject.has("service")){
+                    leg.service = legObject.getString("service");
+                }
+
 
 
                 leg.from = fromLoc;
