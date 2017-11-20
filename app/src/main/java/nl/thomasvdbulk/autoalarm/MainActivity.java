@@ -21,9 +21,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -39,6 +41,12 @@ public class MainActivity extends BaseActivity {
     public static final String DATA_SHARED_FILE = "calendarIds";
     public static final String DATA_CALENDAR_ID_KEY = "nl.thomasvdbulk.autoalarm.calendarids";
     public static final String BROADCAST_UPDATE_GUI = "nl.thomasvdbulk.autoalarm.BROADCAST_UPDATE_GUI";
+
+    public static final String DATA_EVENT_TITLE = "nl.thomasvdbulk.autoalarm.event.TITLE";
+    public static final String DATA_EVENT_BEGIN = "nl.thomasvdbulk.autoalarm.event.BEGIN";
+    public static final String DATA_EVENT_LOCATION = "nl.thomasvdbulk.autoalarm.event.LOCATION";
+    public static final String DATA_EVENT_DESCRIPTION = "nl.thomasvdbulk.autoalarm.event.DESCRIPTION";
+
     public static final String LOG_TAG = "AutoAlarm debugging";
 
     protected CalendarEvent calendarObject;
@@ -64,6 +72,15 @@ public class MainActivity extends BaseActivity {
         } else {
             calendarIds = new HashSet<>();
         }
+
+        if(sharedPref.contains(DATA_EVENT_TITLE)){
+            calendarObject = new CalendarEvent();
+            calendarObject.title = sharedPref.getString(DATA_EVENT_TITLE, "");
+            calendarObject.location = sharedPref.getString(DATA_EVENT_LOCATION, "");
+            calendarObject.begin = sharedPref.getString(DATA_EVENT_BEGIN, "");
+            calendarObject.description = sharedPref.getString(DATA_EVENT_DESCRIPTION, "");
+        }
+
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WAKE_LOCK, Manifest.permission.SET_ALARM},
@@ -141,6 +158,21 @@ public class MainActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                if(calendarObject != null) {
+                    try {
+
+                        SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.ENGLISH);
+                        ((TextView) findViewById(R.id.event_what)).setText(calendarObject.title + " at " + timeFormatter.format(new Date(Long.parseLong(calendarObject.begin))));
+                    } catch(NumberFormatException e){
+                        Log.d(MainActivity.LOG_TAG, "'begin' could not be converted to a long", e);
+                    }
+                    ((TextView) findViewById(R.id.event_where)).setText(("At " + calendarObject.location));
+                    ((TextView) findViewById(R.id.event_description)).setText(calendarObject.description);
+                }
+
+
+
                 LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout linearLayout = findViewById(R.id.journey_list);
                 linearLayout.removeAllViews();
@@ -160,9 +192,9 @@ public class MainActivity extends BaseActivity {
 
                     ((TextView)legView.findViewById(R.id.type)).setText(type);
                     ((TextView)legView.findViewById(R.id.duration)).setText(leg.duration);
-                    ((TextView)legView.findViewById(R.id.from)).setText(leg.from.name);
+                    ((TextView)legView.findViewById(R.id.from)).setText("From: " + leg.from.name);
                     ((TextView)legView.findViewById(R.id.from_time)).setText(formatDate(leg.departure));
-                    ((TextView)legView.findViewById(R.id.to)).setText(leg.to.name);
+                    ((TextView)legView.findViewById(R.id.to)).setText("To: " + leg.to.name);
                     ((TextView)legView.findViewById(R.id.to_time)).setText(formatDate(leg.arrival));
 
                     // Alternate it!
@@ -183,11 +215,25 @@ public class MainActivity extends BaseActivity {
     }
 
     protected void setAlarm(Calendar calendar, CalendarEvent event){
+        SharedPreferences sharedPref = getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
         if(event == null){
             Log.d(MainActivity.LOG_TAG, "calendarObject is null!");
+            editor.remove(DATA_EVENT_TITLE);
+            editor.remove(DATA_EVENT_BEGIN);
+            editor.remove(DATA_EVENT_LOCATION);
+            editor.remove(DATA_EVENT_DESCRIPTION);
+        } else {
+            editor.putString(DATA_EVENT_TITLE, event.title);
+            editor.putString(DATA_EVENT_BEGIN, event.begin);
+            editor.putString(DATA_EVENT_LOCATION, event.location);
+            editor.putString(DATA_EVENT_DESCRIPTION, event.description);
+            editor.apply();
         }
 
         calendarObject = event;
+
+
 
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, ApiRequestAlarm.class);

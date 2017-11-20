@@ -188,8 +188,10 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
 
                 // Now we add some stuff for later
 
-                if(leg.type.equalsIgnoreCase("train")){
-                    leg.service = "platform " + departureObject.getString("platform") +" -> "+arrivalObject.getString("platform");
+                if(leg.type.equalsIgnoreCase("train")) {
+                    leg.service = "to "+legObject.getString("destination") + " (platform " + departureObject.getString("platform") + " to " + arrivalObject.getString("platform")+")";
+                } else if(leg.type.equals("bus")){
+                    leg.service = legObject.getString("service") + " to " + legObject.getString("destination");
                 } else if(legObject.has("service")){
                     leg.service = legObject.getString("service");
                 }

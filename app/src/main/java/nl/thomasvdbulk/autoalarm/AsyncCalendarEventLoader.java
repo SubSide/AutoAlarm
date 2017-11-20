@@ -12,7 +12,6 @@ import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.support.v4.content.ContextCompat;
 
-import java.util.List;
 import java.util.Set;
 
 import nl.thomasvdbulk.autoalarm.background.CalendarEvent;
@@ -22,7 +21,7 @@ public class AsyncCalendarEventLoader extends AsyncTask<MainActivity, Void, Void
     private Set<String> calendarIds;
     private long timeToWakeUp;
 
-    public AsyncCalendarEventLoader(Set<String> calendarIds, long timeToWakeUp){
+    AsyncCalendarEventLoader(Set<String> calendarIds, long timeToWakeUp){
         super();
         this.calendarIds = calendarIds;
         this.timeToWakeUp = timeToWakeUp;
@@ -70,6 +69,7 @@ public class AsyncCalendarEventLoader extends AsyncTask<MainActivity, Void, Void
         event.title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
         event.begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
         event.location = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION));
+        event.description = cur.getString(cur.getColumnIndex(CalendarContract.Instances.DESCRIPTION));
         mainActivity.setAlarm(calendar, event);
 
         cur.close();
@@ -85,7 +85,7 @@ public class AsyncCalendarEventLoader extends AsyncTask<MainActivity, Void, Void
     }
 
     private Cursor getCursorFromTo(Context context, long startDay, long endDay){
-        String[] projection = new String[] { BaseColumns._ID, CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.EVENT_LOCATION };
+        String[] projection = new String[] { BaseColumns._ID, CalendarContract.Instances.CALENDAR_ID, CalendarContract.Instances.TITLE, CalendarContract.Instances.DESCRIPTION, CalendarContract.Instances.BEGIN, CalendarContract.Instances.EVENT_LOCATION };
 
         String selection = CalendarContract.Instances.CALENDAR_ID + " IN ("+makePlaceholders(calendarIds.size()) + ")";
         String[] selectionArgs = calendarIds.toArray(new String[calendarIds.size()]);

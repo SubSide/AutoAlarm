@@ -8,16 +8,42 @@
     tools:context=".MainActivity"
     android:id="@+id/main"
     tools:showIn="@layout/base_view">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/event_info"
+        android:padding="15dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/headerAccent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_what"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_where"
+            android:textSize="15sp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/event_description"
+            android:paddingTop="10dp"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="fill_parent"
+        android:layout_below="@id/event_info">
         <LinearLayout
             android:id="@+id/journey_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="5dp"
             android:background="@android:color/transparent"
             android:cacheColorHint="@android:color/transparent"
             android:divider="#CCCCCC"
