@@ -111,7 +111,7 @@ public class PickCalendarActivity extends BaseActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
 
         editor.putStringSet(MainActivity.DATA_CALENDAR_ID_KEY, itemIds);
-        editor.apply();
+        editor.commit();
 
         super.onBackPressed();
     }

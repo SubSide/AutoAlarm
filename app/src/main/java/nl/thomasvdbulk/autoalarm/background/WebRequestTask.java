@@ -213,13 +213,11 @@ public class WebRequestTask extends AsyncTask<Context, Void, String> {
             return;
 
         // We send an update to the GUI here
-        // Which needs to be done here... Because setting an alarm will
-        // pause the main activity for just a brief moment, ending up with
-        // The broadcast not being displayed.
-        // We commented it out because we lose focus, which means onResume is getting called,
-        // which calls showEvents()
-        Intent broadcastIntent = new Intent(MainActivity.BROADCAST_UPDATE_GUI);
-        context.sendBroadcast(broadcastIntent);
+        // Which doesn't need to be done here... Because setting an alarm will
+        // pause the main activity for just a brief moment, which means onResume
+        // will be triggered. which updates the screen for us
+//        Intent broadcastIntent = new Intent(MainActivity.BROADCAST_UPDATE_GUI);
+//        context.sendBroadcast(broadcastIntent);
 
         try {
             SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm", Locale.ENGLISH);

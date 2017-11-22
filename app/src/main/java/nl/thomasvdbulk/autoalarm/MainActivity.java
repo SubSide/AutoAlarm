@@ -23,11 +23,9 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.Set;
 
 import nl.thomasvdbulk.autoalarm.background.ApiRequestAlarm;
 import nl.thomasvdbulk.autoalarm.background.CalendarEvent;
@@ -49,12 +47,8 @@ public class MainActivity extends BaseActivity {
 
     public static final String LOG_TAG = "AutoAlarm debugging";
 
-    protected CalendarEvent calendarObject;
     private boolean pickedCalendars = false;
-    private Set<String> calendarIds;
     private long timeToWakeUp = 60 * 60 * 1000;
-
-    private BroadcastReceiver mReceiver;
 
     AppDatabase db;
 
@@ -65,35 +59,22 @@ public class MainActivity extends BaseActivity {
 
         db = Room.databaseBuilder(this, AppDatabase.class, "journeys").build();
 
-        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
-        if(sharedPref.contains(MainActivity.DATA_CALENDAR_ID_KEY)){
-            calendarIds = sharedPref.getStringSet(MainActivity.DATA_CALENDAR_ID_KEY, new HashSet<String>());
-            pickedCalendars = true;
-        } else {
-            calendarIds = new HashSet<>();
-        }
-
-        if(sharedPref.contains(DATA_EVENT_TITLE)){
-            calendarObject = new CalendarEvent();
-            calendarObject.title = sharedPref.getString(DATA_EVENT_TITLE, "");
-            calendarObject.location = sharedPref.getString(DATA_EVENT_LOCATION, "");
-            calendarObject.begin = sharedPref.getString(DATA_EVENT_BEGIN, "");
-            calendarObject.description = sharedPref.getString(DATA_EVENT_DESCRIPTION, "");
-        }
-
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WAKE_LOCK, Manifest.permission.SET_ALARM},
                 PERMISSION_REQUEST_PERMISSIONS);
 
         FloatingActionButton fab = findViewById(R.id.refresh);
-        final Context thiz = this;
         fab.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                setAlarm(Calendar.getInstance(), calendarObject);
+                setAlarm(Calendar.getInstance());
             }
         });
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 1);
+        setAlarm(calendar);
     }
 
     @Override
@@ -109,8 +90,6 @@ public class MainActivity extends BaseActivity {
                 return;
             }
         }
-
-        new AsyncCalendarEventLoader(calendarIds, timeToWakeUp).execute(this);
     }
 
     @Override
@@ -125,6 +104,14 @@ public class MainActivity extends BaseActivity {
 //        };
 //
 //        this.registerReceiver(mReceiver, intentFilter);
+
+
+        // If we've already selected the calendar we want to make sure we don't send the user to
+        // the pick calendars over and over again
+        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
+        if(sharedPref.contains(MainActivity.DATA_CALENDAR_ID_KEY)){
+            pickedCalendars = true;
+        }
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED)
             showEvents();
@@ -158,7 +145,7 @@ public class MainActivity extends BaseActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
+                CalendarEvent calendarObject = getCalendarEvent();
                 if(calendarObject != null) {
                     try {
 
@@ -207,6 +194,21 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private CalendarEvent getCalendarEvent(){
+        SharedPreferences sharedPref = this.getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
+        if(!sharedPref.contains(DATA_EVENT_TITLE)) {
+            return null;
+        }
+
+        CalendarEvent calendarObject = new CalendarEvent();
+        calendarObject.title = sharedPref.getString(DATA_EVENT_TITLE, "");
+        calendarObject.location = sharedPref.getString(DATA_EVENT_LOCATION, "");
+        calendarObject.begin = sharedPref.getString(DATA_EVENT_BEGIN, "");
+        calendarObject.description = sharedPref.getString(DATA_EVENT_DESCRIPTION, "");
+
+        return calendarObject;
+    }
+
     public String formatDate(String date){
         if(date == null || !date.contains("T"))
             return "";
@@ -214,32 +216,9 @@ public class MainActivity extends BaseActivity {
         return date.split("T")[1];
     }
 
-    protected void setAlarm(Calendar calendar, CalendarEvent event){
-        SharedPreferences sharedPref = getSharedPreferences(MainActivity.DATA_SHARED_FILE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        if(event == null){
-            Log.d(MainActivity.LOG_TAG, "calendarObject is null!");
-            editor.remove(DATA_EVENT_TITLE);
-            editor.remove(DATA_EVENT_BEGIN);
-            editor.remove(DATA_EVENT_LOCATION);
-            editor.remove(DATA_EVENT_DESCRIPTION);
-        } else {
-            editor.putString(DATA_EVENT_TITLE, event.title);
-            editor.putString(DATA_EVENT_BEGIN, event.begin);
-            editor.putString(DATA_EVENT_LOCATION, event.location);
-            editor.putString(DATA_EVENT_DESCRIPTION, event.description);
-            editor.apply();
-        }
-
-        calendarObject = event;
-
-
-
+    protected void setAlarm(Calendar calendar){
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, ApiRequestAlarm.class);
-        intent.putExtra("title", event.title);
-        intent.putExtra("begin", event.begin);
-        intent.putExtra("location", event.location);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         calendar.set(Calendar.AM_PM, Calendar.AM);
