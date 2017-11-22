@@ -75,7 +75,7 @@ public class ApiRequestAlarm extends BroadcastReceiver {
             return null;
         }
 
-        if(startDay != 0 && endDay != 0) {
+        if(startDay == 0 && endDay == 0) {
             Calendar calendar = getCalendarAtMidnight();
             startDay = calendar.getTimeInMillis();
             calendar.set(Calendar.HOUR_OF_DAY, 23);
@@ -89,6 +89,7 @@ public class ApiRequestAlarm extends BroadcastReceiver {
 
         // Check if we can find any calendar item or if the first event of the day is already past
         if(!cur.moveToNext() || cur.getLong(cur.getColumnIndex(CalendarContract.Instances.END)) < Calendar.getInstance().getTimeInMillis()){
+            Log.d(MainActivity.LOG_TAG, "Event not found, will look for next day!");
             Calendar calendar = getCalendarAtMidnight();
             calendar.add(Calendar.DATE, 1);
             startDay = calendar.getTimeInMillis();
