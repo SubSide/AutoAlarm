@@ -6,33 +6,54 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
-    android:id="@+id/main"
-    tools:showIn="@layout/base_view">
+    android:id="@+id/main">
+
     <LinearLayout
+        android:id="@+id/event_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/event_info"
-        android:padding="15dp"
         android:layout_marginBottom="5dp"
-        android:background="@color/headerAccent">
-        <TextView
-            android:layout_width="match_parent"
+        android:background="@color/headerAccent"
+        android:orientation="horizontal"
+        android:padding="15dp">
+
+        <LinearLayout
             android:layout_height="wrap_content"
-            android:id="@+id/event_what"
-            android:textSize="17sp"
-            android:textStyle="bold"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/event_where"
-            android:textSize="15sp"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/event_description"
-            android:paddingTop="10dp"
-            android:textSize="12sp" />
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/event_what"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/event_where"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/event_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/refresh"
+            android:layout_width="@dimen/refresh_size"
+            android:layout_height="@dimen/refresh_size"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:contentDescription="@null"
+            android:focusable="true"
+            android:src="@drawable/refresh" />
     </LinearLayout>
 
     <ScrollView
@@ -51,18 +72,4 @@
             android:orientation="vertical">
         </LinearLayout>
     </ScrollView>
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/fab_margin"
-        android:layout_marginEnd="@dimen/fab_margin"
-        android:clickable="true"
-        android:focusable="true"
-        android:contentDescription="@null"
-        android:src="@drawable/refresh"
-        app:fabSize="normal" />
-
 </RelativeLayout>

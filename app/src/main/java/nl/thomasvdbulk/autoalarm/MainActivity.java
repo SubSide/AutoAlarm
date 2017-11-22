@@ -17,6 +17,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,8 +66,8 @@ public class MainActivity extends BaseActivity {
                 new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WAKE_LOCK, Manifest.permission.SET_ALARM},
                 PERMISSION_REQUEST_PERMISSIONS);
 
-        FloatingActionButton fab = findViewById(R.id.refresh);
-        fab.setOnClickListener(new View.OnClickListener(){
+        final ImageView refresh = findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 setAlarm(Calendar.getInstance());
